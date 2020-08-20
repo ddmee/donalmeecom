@@ -1101,7 +1101,7 @@ It looks like this:
 
 ```
 last-exit code is 1
-result is C:\dev\Krypton\bem\tests\py\log.py:7:1: E302 expected 2 blank lines, found 1  C:\dev\Krypton\bem\tests\py\log.py:38:43: F823 local variable 'proc' (defined in enclosing scope on line 19) referenced before assignment  C:\dev\Krypton\bem\tests\py\log.py:58:16: F821 undefined name 'connect'  C:\dev\Krypton\bem\tests\py\log.py:59:27: F821 undefined name 'connect'   2019-04-16 12:00:30,256 ERROR [plugins:addFailure:59] Test failure for py.selftests.test_flake8.Flake8Tests.test_flake8 2019-04-16 12:00:30,266 INFO [run:main:138] Exiting with True False
+result is C:\dev\repo\tests\py\log.py:7:1: E302 expected 2 blank lines, found 1  C:\dev\repo\tests\py\log.py:38:43: F823 local variable 'proc' (defined in enclosing scope on line 19) referenced before assignment  C:\dev\repo\tests\py\log.py:58:16: F821 undefined name 'connect'  C:\dev\repo\tests\py\log.py:59:27: F821 undefined name 'connect'   2019-04-16 12:00:30,256 ERROR [plugins:addFailure:59] Test failure for py.selftests.test_flake8.Flake8Tests.test_flake8 2019-04-16 12:00:30,266 INFO [run:main:138] Exiting with True False
 ```
 
 ### Returning things from functions
