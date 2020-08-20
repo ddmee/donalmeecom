@@ -45,6 +45,8 @@ If you want to try out a Jenkinsfile on a local Jenkins, without using source-co
 
 Go to Jenkins front-page, then ‘new-item’, then select ‘pipeline’ and an item name like ‘tempjob’. Then in the job configuration, there’s a pipeline section. With ‘Pipeline script’ as the definition, you can paste in the contents of a Jenkinsfile and run the job, to see what happens.
 
+![jenkins pipeline configuration](/assets/images/jenkins-pipeline-config.png)
+
 
 ## References
 
