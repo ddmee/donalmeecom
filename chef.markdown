@@ -517,6 +517,25 @@ EOH
 end
 {% endhighlight %}
 
+## Use paths on windows without pain
+
+Paths of windows in chef recipes normally look like this 'C:\\some\\path\\hurts'
+
+You can try various ruby solutions to allow yourself to avoid the double backslash. I never succeeded getting that to work.
+
+This suggestion came from https://www.slideshare.net/opscode/chef-conf-windowsdougireton
+
+{% highlight ruby %}
+# include Windows::Helper from Opscode Windows Cookbook
+::Chef::Recipe.send(:include, Windows::Helper)
+# now you can call helper methods like win_friendly_path
+my_file = win_friendly_path('c:/no/insane/backslashes.tmp')
+
+execute 'My file' do
+  command my_file
+end
+{% endhighlight %}
+
 ## Resources
 
 - https://zwischenzugs.com/2017/11/25/ten-things-i-wish-id-known-about-chef/
