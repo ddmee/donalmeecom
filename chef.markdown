@@ -12,7 +12,7 @@ permalink: /chef/
 * TOC
 {:toc}
 
-##Background
+## Background
 
 Un-testable infrastructure is more hassle than it’s worth. Or at least, it’s difficult to deploy updates to the infrastructure, unless you’re already very familiar with it.
 
