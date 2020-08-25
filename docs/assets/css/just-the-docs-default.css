@@ -195,7 +195,28 @@ hr { height: 1px; padding: 0; margin: 2rem 0; background-color: #eeebee; border:
 
 @media (min-width: 50rem) { .site-header { height: 60px; max-height: 60px; border-bottom: 1px solid #eeebee; } }
 
-.site-title { padding-right: 1rem; padding-left: 1rem; flex-grow: 1; display: flex; height: 100%; align-items: center; padding-top: 0.75rem; padding-bottom: 0.75rem; color: #27262b; font-size: 18px !important; }
+.site-title {
+    padding-right: 1rem;
+    padding-left: 1rem;
+    font-family: 'Permanent Marker', cursive;
+    flex-grow: 1;
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    color: #c2c2d6;
+    font-size: 18px !important;
+    font-size: 4em;
+    letter-spacing: 5px;
+    text-shadow: -2px 4px black;
+}
+
+.site-title:hover, .site-title:active {
+    color: #ff6666;
+    text-shadow: 2px 4px #8c8cd9;
+}
+
 
 @media (min-width: 50rem) { .site-title { padding-right: 2rem; padding-left: 2rem; } }
 

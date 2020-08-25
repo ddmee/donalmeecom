@@ -1,1 +1,102 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-08-20T15:00:29+01:00</updated><id>/feed.xml</id><title type="html">Donal Mee</title><subtitle>Notes on software and other things.</subtitle></feed>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-08-25T14:17:15+01:00</updated><id>/feed.xml</id><title type="html">Donal Mee</title><subtitle>Notes on software and other things.</subtitle><entry><title type="html">Running a Git client-side pre-commit hook</title><link href="/2020/08/25/Pre-commit-git-hooks.html" rel="alternate" type="text/html" title="Running a Git client-side pre-commit hook" /><published>2020-08-25T07:00:00+01:00</published><updated>2020-08-25T07:00:00+01:00</updated><id>/2020/08/25/Pre-commit-git-hooks</id><content type="html" xml:base="/2020/08/25/Pre-commit-git-hooks.html">&lt;h1 id=&quot;how-to-run-a-test-before-every-git-commit&quot;&gt;How to run a test before every git commit&lt;/h1&gt;
+
+&lt;p&gt;Summary:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Configure a git client-side &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prepare-commit-msg&lt;/code&gt; hook to run a test before every commit.&lt;/li&gt;
+  &lt;li&gt;Setup &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.gitconfig&lt;/code&gt; file in the root of the repository and set &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hooksPath = git_hooks&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;Write a bash script inside &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git_hooks\prepare-commit-msg&lt;/code&gt; that runs your tests before a commit.&lt;/li&gt;
+  &lt;li&gt;You can distribute the hooks in the repository but you &lt;strong&gt;cannot&lt;/strong&gt; enforce the (client-side) hooks use.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/ddmee/git-hooks/tree/master/git_hooks&quot;&gt;example-code&lt;/a&gt; is available.&lt;/p&gt;
+
+&lt;h2 id=&quot;running-a-git-client-side-pre-commit-hook&quot;&gt;Running a Git client-side pre-commit hook&lt;/h2&gt;
+
+&lt;p&gt;Git hooks allow you to hook into the pull/commit/push process that git is built around. A hook is useful if you want to extend or customise the behaviour of your repository. There are two types of hooks, server-side commits and client-side commits. Server-side hooks live on a git server (i.e. somewhere people push to, like a centralised github server). Client-side hooks live on each individual contributors development machine.&lt;/p&gt;
+
+&lt;p&gt;Server-side hooks are a way you can enforce certain behaviours on the server. I’m not going to talk about them here. Instead, I’m going to look at client-side hooks.&lt;/p&gt;
+
+&lt;p&gt;Have you ever wanted to run some sort of check on the code you are about to commit? You can do this with a client-side hook. However, one issue with client-side hooks is that they are not versioned in the git repository. I used to think this prohibited ‘distrbution’ of the client-side git hooks with the repository. Which sucks. Because, lets say you introduce a new developer to your repo, perhaps you’d like them to run the same checks as you do, they way you do. Traditionally, that’s not been possible with client-side hooks. However, there is a way (since git version 2.9). You need to configure the ‘hooksPath’.&lt;/p&gt;
+
+&lt;h2 id=&quot;setting-up-client-side-hooks-so-everyone-runs-them&quot;&gt;Setting up client-side hooks so everyone runs them&lt;/h2&gt;
+
+&lt;p&gt;In the root of your git repo, add the file &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.gitconfig&lt;/code&gt; with this content:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[core]
+    hooksPath = git_hooks
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When the repository is cloned, it points git to run hooks from the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git_hooks&lt;/code&gt; subdirectory. Normally, git hooks are stored in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.git/hooks&lt;/code&gt;, and that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.git/&lt;/code&gt; directory is not stored in the version-control (thus prohibiting distribution with the source-code). But with the (new as of git 2.9) &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;hooksPath&lt;/code&gt; option, you can instead point to another directory in the repository that does store the hooks.&lt;/p&gt;
+
+&lt;p&gt;However, git will &lt;em&gt;not&lt;/em&gt; use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.gitconfig&lt;/code&gt; automatically. Apparently it’s a security issue (see &lt;a href=&quot;https://stackoverflow.com/questions/18329621/how-to-store-a-git-config-as-part-of-the-repository&quot;&gt;stackoverflow-store-gitconfig&lt;/a&gt;). Instead, the user who has cloned the repository must explicitly tell git to use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.gitconfig&lt;/code&gt;.  They only need to run this command once. I have it as a &lt;a href=&quot;https://github.com/ddmee/git-hooks/blob/master/setup_repo.sh&quot;&gt;setup_repo.sh&lt;/a&gt; They can do that with this command&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git config &lt;span class=&quot;nt&quot;&gt;--local&lt;/span&gt; include.path &lt;span class=&quot;s1&quot;&gt;'../.gitconfig'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is an essential detail, if you want the distributed client-side hooks to run.&lt;/p&gt;
+
+&lt;h2 id=&quot;running-something-that-changes-the-commit-message&quot;&gt;Running something that changes the commit message&lt;/h2&gt;
+
+&lt;p&gt;Now you need to write a hook inside the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;git_hooks&lt;/code&gt; directory. I am going to write a hook that runs just before the user is asked to input a commit message. The hook is just a bash shell (though it does not have .sh as the filename suffix). If the shell exists with 0, the commit is allowed. Any other exit code blocks the commit. That’s how git hooks work.&lt;/p&gt;
+
+&lt;p&gt;In your git repo, inside ‘git_hooks/’, create a ‘prepare-commit-msg’ file with the contents&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/sh
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Providing an environment variable override is helpful, if users need to by-pass your hook for some reason.
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Set SKIP_HOOK environment variable if you don't want pre-commit tests.
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Example:
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# &amp;gt; $env:SKIP_HOOK=1
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# &amp;gt; git commit
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# &amp;gt; $env:SKIP_HOOK=0
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# The next 3 parameters are the parameters git supplies to the prepare-commit-msg hook. Different hooks get
+&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# different parameters.
+&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;COMMIT_MSG_FILE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$1&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;COMMIT_SOURCE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$2&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;SHA1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$3&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$SKIP_HOOK&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; 1 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;printf&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Warning: SKIP_HOOK set, skipping pre-commit hook!&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;0
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Run tests when this file changes.
+&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;SCRIPTPATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;dirname&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$0&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;printf&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Running pre-commit tests Pester tests are passing at &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$SCRIPTPATH&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;...&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Check Pester tests are passing.
+&lt;/span&gt;
+.&lt;span class=&quot;se&quot;&gt;\r&lt;/span&gt;un_tests.sh
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$?&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; 0 &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
+    &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;printf&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ERROR: detected test failures. Please fix before commiting changes.&quot;&lt;/span&gt;
+    &lt;span class=&quot;nb&quot;&gt;exit &lt;/span&gt;1
+&lt;span class=&quot;k&quot;&gt;fi
+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;printf&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Pre-commits tests have passed, continuing with commit.&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;[Pre-commit tests ran at &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;]&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$COMMIT_MSG_FILE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;outcome&quot;&gt;Outcome&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;If the tests pass, the user will be offered a default commit message that includes the ‘Pre-commit tests ran …’ message. You can see this in the commit &lt;a href=&quot;https://github.com/ddmee/git-hooks/commit/956d3fd00d9ba0fb9195796b7fc2aea402d848be&quot;&gt;956d3fd00d&lt;/a&gt; in the example repository.&lt;/li&gt;
+  &lt;li&gt;If the tests fail, the commit is blocked with the error message.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/ddmee/git-hooks/tree/master/git_hooks&quot;&gt;example-code&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/ddmee/git-hooks/blob/master/setup_repo.sh&quot;&gt;setup_repo.sh&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/ddmee/git-hooks/commit/956d3fd00d9ba0fb9195796b7fc2aea402d848be&quot;&gt;956d3fd00d&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks&quot;&gt;Git-SCM-Book-Git-Hooks&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.tygertec.com/git-hooks-practical-uses-windows/&quot;&gt;git-hooks-practical-users&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/a/39338979&quot;&gt;stackoverflow-core-hookspath&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://stackoverflow.com/questions/18329621/how-to-store-a-git-config-as-part-of-the-repository&quot;&gt;stackoverflow-store-gitconfig&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">How to run a test before every git commit Summary: Configure a git client-side prepare-commit-msg hook to run a test before every commit. Setup .gitconfig file in the root of the repository and set hooksPath = git_hooks. Write a bash script inside git_hooks\prepare-commit-msg that runs your tests before a commit. You can distribute the hooks in the repository but you cannot enforce the (client-side) hooks use. example-code is available. Running a Git client-side pre-commit hook Git hooks allow you to hook into the pull/commit/push process that git is built around. A hook is useful if you want to extend or customise the behaviour of your repository. There are two types of hooks, server-side commits and client-side commits. Server-side hooks live on a git server (i.e. somewhere people push to, like a centralised github server). Client-side hooks live on each individual contributors development machine. Server-side hooks are a way you can enforce certain behaviours on the server. I’m not going to talk about them here. Instead, I’m going to look at client-side hooks. Have you ever wanted to run some sort of check on the code you are about to commit? You can do this with a client-side hook. However, one issue with client-side hooks is that they are not versioned in the git repository. I used to think this prohibited ‘distrbution’ of the client-side git hooks with the repository. Which sucks. Because, lets say you introduce a new developer to your repo, perhaps you’d like them to run the same checks as you do, they way you do. Traditionally, that’s not been possible with client-side hooks. However, there is a way (since git version 2.9). You need to configure the ‘hooksPath’. Setting up client-side hooks so everyone runs them In the root of your git repo, add the file .gitconfig with this content: [core] hooksPath = git_hooks When the repository is cloned, it points git to run hooks from the git_hooks subdirectory. Normally, git hooks are stored in .git/hooks, and that .git/ directory is not stored in the version-control (thus prohibiting distribution with the source-code). But with the (new as of git 2.9) hooksPath option, you can instead point to another directory in the repository that does store the hooks. However, git will not use the .gitconfig automatically. Apparently it’s a security issue (see stackoverflow-store-gitconfig). Instead, the user who has cloned the repository must explicitly tell git to use the .gitconfig. They only need to run this command once. I have it as a setup_repo.sh They can do that with this command git config --local include.path '../.gitconfig' This is an essential detail, if you want the distributed client-side hooks to run. Running something that changes the commit message Now you need to write a hook inside the git_hooks directory. I am going to write a hook that runs just before the user is asked to input a commit message. The hook is just a bash shell (though it does not have .sh as the filename suffix). If the shell exists with 0, the commit is allowed. Any other exit code blocks the commit. That’s how git hooks work. In your git repo, inside ‘git_hooks/’, create a ‘prepare-commit-msg’ file with the contents #!/bin/sh # Providing an environment variable override is helpful, if users need to by-pass your hook for some reason. # Set SKIP_HOOK environment variable if you don't want pre-commit tests. # Example: # &amp;gt; $env:SKIP_HOOK=1 # &amp;gt; git commit # &amp;gt; $env:SKIP_HOOK=0 # The next 3 parameters are the parameters git supplies to the prepare-commit-msg hook. Different hooks get # different parameters. COMMIT_MSG_FILE=$1 COMMIT_SOURCE=$2 SHA1=$3 if [[ &quot;$SKIP_HOOK&quot; == 1 ]]; then printf &quot;\nWarning: SKIP_HOOK set, skipping pre-commit hook!\n&quot; exit 0 fi # Run tests when this file changes. SCRIPTPATH=&quot;$( cd &quot;$(dirname &quot;$0&quot;)&quot; ; pwd -P )&quot; printf &quot;\nRunning pre-commit tests Pester tests are passing at $SCRIPTPATH...\n&quot; # Check Pester tests are passing. .\run_tests.sh if [[ $? != 0 ]]; then printf &quot;\nERROR: detected test failures. Please fix before commiting changes.&quot; exit 1 fi printf &quot;\nPre-commits tests have passed, continuing with commit.\n&quot; echo &quot;[Pre-commit tests ran at $(date)]&quot; &amp;gt;&amp;gt; &quot;$COMMIT_MSG_FILE&quot; Outcome If the tests pass, the user will be offered a default commit message that includes the ‘Pre-commit tests ran …’ message. You can see this in the commit 956d3fd00d in the example repository. If the tests fail, the commit is blocked with the error message. References example-code setup_repo.sh 956d3fd00d Git-SCM-Book-Git-Hooks git-hooks-practical-users stackoverflow-core-hookspath stackoverflow-store-gitconfig</summary></entry></feed>
