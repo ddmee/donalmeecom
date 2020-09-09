@@ -47,6 +47,19 @@ Now with faster hardware, algorithms and data, we are at the point were we can r
 
 Software stack in use in the course: python -> pytorch -> fastai.
 
+Jupyter notebooks is a REPL that lets you execute code as well as output other things like markdown and graphics. So it's a bit different to most development environments coders are used to.
+
+- Here is the actual documentation for the web-gui version of [jupyter labs](jupyter-labs-docs).
+- Fast AI book has a [jupyter notebook 101](fast-book-jupyter-notebook-101).
+
+There are two modes in Jupyter, 'edit mode' and 'command mode'. Edit mode allows you to edit an individual cell. Hit `control-/` to add a comment. And hit `shift-enter` to execute the cell. You are in editing mode when a flashing-cursor is present in a cell.
+
+Command mode is the other mode. It is not for editing individual cells, but lets you move around the notebook and do other things. There are quite a lot of short-cuts available.
+
+In the web-gui, you can input `control-shift-c` to open the command palette.
+
+An important thing to remember is that when you execute a cell that runs code, that updates the state of the REPL. So lets say you set a variable to be the value 4. That means the REPL state has been updated and if you are to re-run any cell command that uses that variable, the starting value is going to be 4. When a cell is run and output is created, that output is the value of the expression at the time the cell was run. So if you later update the state or value, unless the cell is re-run, the cells output is not altered.
+
 
 ## Referefences
 
@@ -61,7 +74,9 @@ Software stack in use in the course: python -> pytorch -> fastai.
 [course-fast-ai]: https://course.fast.ai/
 [course-fast-ai-videos-lesson-1]: https://course.fast.ai/videos/?lesson=1
 [fast-book-git]: https://github.com/fastai/fastbook
+[fast-book-jupyter-notebook-101]: https://github.com/fastai/fastbook/blob/master/app_jupyter.ipynb
 [deep-learning-for-coders-book-amazon]: https://www.amazon.co.uk/Deep-Learning-Coders-fastai-PyTorch/dp/1492045527
 [google-cloud-console]: https://console.cloud.google.com/
 [google-cloud-setup-instructions]: https://course.fast.ai/start_gcp
 [google-cloud-notebook-instances]: https://console.cloud.google.com/ai-platform/notebooks/list/instances
+[jupyter-lab-docs]: https://jupyterlab.readthedocs.io
