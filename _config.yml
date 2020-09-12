@@ -33,11 +33,15 @@ github_username:  ddmee
 ga_tracking: UA-135505936-1
 ga_tracking_anonymize_ip: true # Use GDPR compliant Google Analytics settings (true by default)
 
-
 # Build settings
 theme: "just-the-docs"
 plugins:
   - jekyll-feed
+
+# for sitemap generator
+url: "https://www.donal.mee.com" # the base hostname & protocol for your site
+plugins:
+  - jekyll-sitemap
 
 # Exclude from processing.
 # The following items will not be processed, by default.
