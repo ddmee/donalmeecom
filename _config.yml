@@ -39,7 +39,7 @@ plugins:
   - jekyll-feed
 
 # for sitemap generator
-url: "https://www.donal.mee.com" # the base hostname & protocol for your site
+url: "https://www.donalmee.com" # the base hostname & protocol for your site
 plugins:
   - jekyll-sitemap
 
