@@ -149,6 +149,23 @@ What is the data you have is bias? Say for policing, drug use is equivalent acro
 
 How can a model interact with it's environment? If you begin with bias data and use that to drive actions that change the environment to be more like the model, then even if the environment was not bias to start with, you can make the environment more bias.
 
+## Using image recognition for other things
+
+Not restricted to using image recognition networks to do plain image recognition. If you can convert the data from some other source into something that can be represented as an image, then you might be able to use an image-recogniser network on it.
+
+For example:
+- converting sounds to an image to recognise them https://medium.com/@etown/great-results-on-audio-classification-with-fastai-library-ccaf906c5f52
+- converting time-series to an image for olive-oil classification 
+- converting user mouse-movements to an image to detect fraud https://www.splunk.com/en_us/blog/security/deep-learning-with-splunk-and-tensorflow-for-security-catching-the-fraudster-in-neural-networks-with-behavioral-biometrics.html
+- converting malware binaries to images to classify malware https://ieeexplore.ieee.org/abstract/document/8328749
+
+## Deep learning is not just for classification
+
+Classification places inputs into discrete buckets. But we can also use deep learning to do regression to produce predictions that are continous outputs. E.g. segmentation is about dividing a region into recognisable areas. This can be used in computer vision to recognise objects in a scene.
+
+> "Classification and Regression: classification and regression have very specific meanings in machine learning. These are the two main types of model that we will be investigating in this book. A classification model is one which attempts to predict a class, or category. That is, it's predicting from a number of discrete possibilities, such as "dog" or "cat." A regression model is one which attempts to predict one or more numeric quantities, such as a temperature or a location. Sometimes people use the word regression to refer to a particular kind of model called a linear regression model; this is a bad practice"
+
+
 ## Fast AI
 
 The documentation for the fastai library is at [fast-ai-docs](fast-ai-docs).
@@ -198,7 +215,7 @@ The documentation for the fastai library is at [fast-ai-docs](fast-ai-docs).
 
 10. Why is it hard to use a traditional computer program to recognise images in a photo?
 
-    It's not clear how for-loops, boolean logic and value stores could be used to tell the different between an image of a cat and a dog. The difference between a cat and a dog or a stool and an airport, are hard to describe if you had to use those concepts.
+    It's not clear how for-loops, boolean logic and value stores could be used to tell the difference between an image of a cat and a dog. The difference between a cat and a dog or a chair and an airport, are hard to describe if you had to use those concepts.
 
 11. What did Samuel mean by 'weight assignment'?
 
@@ -208,7 +225,7 @@ The documentation for the fastai library is at [fast-ai-docs](fast-ai-docs).
 
     Parameters (to the model, itself is also called the architecture).
 
-13. Draw a picture that summaziers Samuel's view of a machine learning model.
+13. Draw a picture that summarises Samuel's view of a machine learning model.
 
     Feed input to a flexible mathematical function that can replicate any mathematical relationship. The model begins with some predefined parameters that define how the function of that model transforms input to output. The input is run through the model. For each input through the model, the output is assessed and the result of this is feed into the model again by altering the weights. This processes goes on until we believe the model has learned enough to classify the input so it reliably gets the right classification/prediction for the output.
 
@@ -221,9 +238,9 @@ The documentation for the fastai library is at [fast-ai-docs](fast-ai-docs).
 
 14. Why is it hard to understand why a deep learning model makes a particular prediction?
 
-    The model is a complicated compounding feedback mechanism that is built on shoving lots of data through the model and then slowly evoling the model until it's weight produce the right output. This makes it practically impossible for anyone to follow the evolution of the model, as it has to be done at super human speeds.
+    The model is a complicated compounding feedback mechanism that is built on shoving lots of data through the model and then slowly evoling the model until it's weight produce the right output. As this is done at super human speeds, it's tricky to follow the evolution of the model. However, there is research into how we can understand the inner-workings o a trained network https://arxiv.org/pdf/1311.2901.pdf
 
-15. What is the name of the theorum that shows that a neural netowkr can solve any mathematical problem to any level of accuracy?
+15. What is the name of the theorum that shows that a neural network can solve any mathematical problem to any level of accuracy?
 
     Universal approximation theorem.
 
@@ -241,13 +258,23 @@ The documentation for the fastai library is at [fast-ai-docs](fast-ai-docs).
 
 19. What is the difference between classificaton and regression?
 
+    Regression is predicting continuous data whereas classification is predicting categorical/discrete information.
+
 20. What is a validation set? What is a test set? Why do we need them?
 
-    We cannot consume all the labelled input data to train the model without risking producing a model that is overfit. Producing a feel fitted model is an art not a science. It requires a lot of tinkering. We need to prevent some of the input data from being exposed to the model during the training process so we can determine whether the model is overfit and what level of accuracy we think the model has reached (error level).
+    We cannot consume all the labelled input data to train the model without risking producing a model that is overfit. Producing a well fitted model is an art not a science. It requires a lot of tinkering. We need to prevent some of the input data from being exposed to the model during the training process so we can determine whether the model is overfit and what level of accuracy we think the model has reached (error level). This is the validation set. We use it to evaluate and tkinker with the model during the training phrase. But we don't train the model on the validation set. It measure the performance or loss.
+
+    There is a second, more highly-reserved, data-set called the 'test' set. The test set is used to evaluate whether the hyper-parameters have been overfit. By using a validation set, we tkinter with the model until it performs better on the test-set. But this tkinkering process may make the model design overfit. The test set is held back and is only used to evaluate the model at the very end.
+
+    > "In effect, we define a hierarchy of cuts of our data, based on how fully we want to hide it from training and modeling processes: training data is fully exposed, the validation data is less exposed, and test data is totally hidden. This hierarchy parallels the different kinds of modeling and evaluation processes themselves—the automatic training process with back propagation, the more manual process of trying different hyper-parameters between training sessions, and the assessment of our final result."
 
 21. What will fastai do if you don't provide a validation set?
 
+    Defaults to using holding 20% of the data back as the validation set.
+
 22. Can we always use a random sample for a validation set? Why or why not?
+
+    No, some data, like time-series data, holding a random 20% of the data back still effectively shows the model in the training process the entire view of the data. For time series we would want to hold back certain segments of time from the model, like the last 20% of the data should be held back. To then allow the model to predict what the 'future' 20% of the data is to look like.
 
 23. What is overfitting? Provide an example.
 
@@ -255,21 +282,39 @@ The documentation for the fastai library is at [fast-ai-docs](fast-ai-docs).
 
 24. What is a metric? How does it differ from 'loss'?
 
+    Both a metric and a loss are a measure of the performance of a models predictions. But the metric is a number designed to describe performance in a way intelligible for a human. Whereas the loss is a number designed to help 'train' or alter the models parameters. I.e. it's a number that stochastic gradient descent can process.
+
 25. How can pretrained models help?
+
+    Pretrained models can be re-used for new situations, reducing the amount of training data a new model needs and speeding up the training time. For example, in image classifications, a pre-trained model being applied to a new situation can useful share many layers of the model. The early layers of the model tend to be similar across similar problems, whereas the later layers are more specialised to the particular task. Re-using a pretrained model for a new task in a different domain is called 'transfer' learning.
 
 26. What is the 'head' of a model?
 
+    The 'head' of the model is the last layer in the neural network. When we re-use a pretrained model, is it common to throw away the last layer or 'head' of the model. As the last layer is perhaps the most specialised part of the model. Replacing the 'head' of the model in transfer-learning is part of the 'fine-tuning' process to adapt the network to the new problem.
+
 27. What kinds of features do the early layers of a CNN find? How about the later layers?
+
+
 
 28. Are image models only useful for photos?
 
+    No. Noted above, provided you can transform your data into images in a representative way, image models could potentially be useful.
+
 29. What is an 'architecture'?
+
+    Architecture is another name for the model. It describes what how the neural-network or central processing behaviour of the model is defined.
 
 30. What is segmentation?
 
+    Segmentation is cutting up a region into different parts.
+
 31. What is y_range used for? When do we need it?
 
+    The y_range is used in fastai for continous data to describe the range of the data.
+
 32. What are 'hyperparameters'?
+
+    Hyper-parameters are things that control how the parameters or model is updated. The learning rate, network architecture, data augmentation strategies. They are the essentially design choices on how the learning process is created.
 
 33. What's the best way to avoid failures when using AI in an organisation?
 
