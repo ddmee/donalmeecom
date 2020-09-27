@@ -1363,3 +1363,37 @@ POSH seems to expect everyone to use dynamic method/attribute addition methods t
 Actually, you'd think erroraction is respected. It's not... There's some commentary above.
 
 But basically you can't know ahead of time whether something is going to use 'throw' and so whether you need to wrap it in a try/catch. You basically have to write a parser... see the abstract. Note, how to write a parser for dotnet code is more tricky I suspect.
+
+
+### GUIs with Powershell
+
+From Mr Powershell.
+
+{% highlight powershell %}
+Add-Type -AssemblyName System.Windows.Forms
+$Form = New-Object system.Windows.Forms.Form
+$Form.Text = "Form"
+$Form.TopMost = $true
+$Form.Width = 200
+$Form.Height = 200
+$GetDate = New-Object system.windows.Forms.Button
+$GetDate.Text = "GetDate"
+$GetDate.Width = 100
+$GetDate.Height = 30
+$GetDate.Add_Click({
+#add here code triggered by the event
+    $Results.Text = Get-Date
+})
+$GetDate.location = new-object system.drawing.point(60,60)
+$GetDate.Font = "Microsoft Sans Serif,10"
+$Form.controls.Add($GetDate)
+$Results = New-Object system.windows.Forms.TextBox
+$Results.Text = ""
+$Results.Width = 100
+$Results.Height = 20
+$Results.location = new-object system.drawing.point(40,23)
+$Results.Font = "Microsoft Sans Serif,10"
+$Form.controls.Add($Results)
+[void]$Form.ShowDialog()
+$Form.Dispose(); write-host "Date entered is $($Results.text)"
+{% endhighlight %}
