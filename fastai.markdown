@@ -342,15 +342,24 @@ Issues with p-values:
 
 The p-value measures the likelihood to relationship was produced by random. However, it does not measure how large the effect is. Plus it does not tell you whether the hypothesis is real. The p-value was invented by Ronald Fisher, one of the fathers of modern statitics. He did not intend for it to be used in any sort of definitive way. He suggested it is used by researchers to decide whether it's worth having a second-look at the data their studying. But in practice, in a lot of fields, p-values < 0.05 have become the bar for publication. The simple application of p-values is naive. Greater sophisication is needed to reliably apply statistics.
 
+#### ASA Statement on P-values
+
+https://amstat.tandfonline.com/doi/full/10.1080/00031305.2016.1154108
+
+It says the p-value describes "how incompatible the data are with a specified statistical model". I.e. the p-value is a measure of how strange it is to see the data given the null-hypothesis is correct. But this means the p-value is not a "measure [of] the probability that the studied hypothesis is true, or the probability that the data were produced by random chance alone". The last part of this statement, I don't quite understand. I thought the p-value is primarily a measure of how likely it is the data is random (provided your models of the distribution is correct. Though I guess know whether your distribution model is correct is ... hard to know). "
+Scientific conclusions and business or policy decisions should not be based only on whether a p-value passes a specific threshold". Yeah, this is basically saying the measure isn't everything and study design and all other sorts of factors are important to understand the situation. "Proper inference requires full reporting and transparency". I.e. it's not valid to run 100s of experiments and only report the ones that meet your p-value thresholds, as your basically dredging the data until you get a reading you want. The term 'p-hacking' is used for this sort of behaviour. "A p-value, or statistical significance, does not measure the size of an effect or the importance of a result". Yeah, the p-value doesn't say anything about what the relationship between the independent and dependent variables. 
+
+The wikipedia page on [P-Values](https://en.wikipedia.org/wiki/P-value) is pretty good.
+
+
 
 ## Chapter 2 Questionaire
 
 1. What is a p value?
+
 2. What is a prior?
 
 3. Provide an example of where the bear classification model might work poorly in production, due to structural or style differences in the training data.
-
-
 
 4. Where do text models currently have a major deficiency?
 
@@ -434,15 +443,25 @@ Export saves a pickle object of the model, to disk, that you can then later relo
 
 22. What is it called when we use a model for getting predictions, instead of training?
 
-
+Interference
 
 23. What are IPython widgets?
+
 24. When might you want to use CPU for deployment? When might GPU be better?
+
 25. What are the downsides of deploying your app to a server, instead of to a client (or edge) device such as a phone or PC?
+
 26. What are three examples of problems that could occur when rolling out a bear warning system in practice?
+
 27. What is "out-of-domain data"?
+
 28. What is "domain shift"?
+
 29. What are the three steps in the deployment process?
+
+Train the model.
+Save the model.
+Make inferences from the model.
 
 
 https://www.oreilly.com/radar/drivetrain-approach-data-products/
