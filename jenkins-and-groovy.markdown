@@ -48,14 +48,27 @@ Go to Jenkins front-page, then ‘new-item’, then select ‘pipeline’ and an
 ![jenkins pipeline configuration](/assets/images/jenkins-pipeline-config.png)
 
 
+## Documentation
+
+I always struggled to find where the documentation is for different bits of jenkins.
+
+For the Job's DSL "https://your.jenkins.installation/plugin/job-dsl/api-viewer/index.html"
+- Documents which DSL functions are available for your jenkins
+- The actual plugin documentation is here [job-dsl-plugin]
+- There is also a playgen thing here [job-dsl-playpen]
+
+
 ## References
 
 - [javadoc-jenkins-ci]
 - [jenkins-book-pipeline]
 - [jenkins-book-pipeline-steps]
 - [pluralsight-automating-jenkins-groovy]
+- [job-dsl-plugin]
 
 [javadoc-jenkins-ci]: https://javadoc.jenkins-ci.org/
 [jenkins-book-pipeline]: https://www.jenkins.io/doc/book/pipeline/
 [jenkins-book-pipeline-steps]: https://www.jenkins.io/doc/pipeline/steps/
 [pluralsight-automating-jenkins-groovy]: https://www.pluralsight.com/courses/automating-jenkins-groovy
+[job-dsl-plugin]: https://plugins.jenkins.io/job-dsl/
+[job-dsl-playpen]: https://job-dsl.herokuapp.com/
