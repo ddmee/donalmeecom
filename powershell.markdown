@@ -1397,3 +1397,194 @@ $Form.controls.Add($Results)
 [void]$Form.ShowDialog()
 $Form.Dispose(); write-host "Date entered is $($Results.text)"
 {% endhighlight %}
+
+### Trap statements
+
+You can write a trap {} statement at the top of a module and any unhandled error will pop up into this trap. It's very strange.
+
+```
+help about_trap
+```
+
+```
+param(
+    $whatever
+)
+trap {
+    write-warning "TRAP HANDLER"
+    $_
+    exit 1
+}
+
+# other scripting here if hits an error
+...
+# the error is caught by the trap.
+```
+
+you could throw, and have a top-level trap which will run if exceptions are not caught - that way you can log into the Jenkins console the uncaught exception, then always return the appropriate exit code too
+
+It's handy in the model of: modules of lots of functions, plus one top-use-case-level-script using whichever functions it wants...in that one use-case-level-script you bang in a trap to turn powershell error objects into serialised objects and some console printing, then exit.
+
+say instead of doing this
+
+```
+# Execute each supplied action, switching on the action
+ForEach ($Act in $Actions) {
+    switch($Act) {
+        "Seed" { $result = Step-FoodparkSeed -VmaasUser $VmaasUser -VmaasToken $VmaasToken @ExtraParams }
+        "Build" { $result = Step-FoodparkBuild @ExtraParams }
+        "Test" { $result = Step-FoodparkTest @ExtraParams }
+        "Finalize" { $result = Step-FoodparkFinalize @ExtraParams }
+    }
+    if ($result.exitCode -ne 0) {
+        # Need to signal to jenkins or whatever build system that the step failed.
+        write-warning "Step-Foodpark$Act result.exitCode=$($result.exitCode), exiting pipeline"
+        exit $result.exitCode
+    }
+    else {
+        # all good
+        write-verbose "Step-Foodpark$Act result.exitCode=0"
+    }
+}
+```
+
+you could throw, and have a top-level trap which will run if exceptions are not caught - that way you can log into the Jenkins console the uncaught exception, then always return the appropriate exit code too
+
+you can throw from each place, but the single trap is to catch all uncaught exceptions - so you just have the one, typically at the top of a script.
+
+```
+(33)C:\tmp\suvp2010woe> & { trap {"oops! $_"}; sillycommand1; sillycommand2}
+oops! The term 'sillycommand1' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+sillycommand1 : The term 'sillycommand1' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try
+again.
+At line:1 char:24
++ & { trap {"oops! $_"}; sillycommand1; sillycommand2}
++                        ~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (sillycommand1:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+oops! The term 'sillycommand2' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+sillycommand2 : The term 'sillycommand2' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try
+again.
+At line:1 char:39
++ & { trap {"oops! $_"}; sillycommand1; sillycommand2}
++                                       ~~~~~~~~~~~~~
+    + CategoryInfo          : ObjectNotFound: (sillycommand2:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+```
+
+
+### Exit codes aren't what they seem
+
+https://stackoverflow.com/questions/10666101/lastexitcode-0-but-false-in-powershell-redirecting-stderr-to-stdout-gives
+
+Sometimes $? can be $true but the $lastexitcode is greater than 0.
+
+### Variable squashing
+
+
+```
+[10/28 8:57 AM] Howes, Tim
+    A nice thing in interactive Powershell, especially when working through with someone else remotely: "variable squeezing"
+(1 liked)​[10/28 8:57 AM] Howes, Tim
+    
+> ($toUseAgain=get-date)
+28 October 2020 08:56:57
+> $touseagain
+28 October 2020 08:56:57
+
+​[10/28 8:58 AM] Howes, Tim
+    obvs that's a daft example, but if you have a long running operation you want to cache the answer into a variable. But you often want to see something straight away, at least to see if the operation worked. So here you get to stuff the result in the variable, and immediately see the pipeline output
+​[10/28 8:58 AM] Howes, Tim
+    ordinarily without the squeeze:
+​[10/28 8:58 AM] Howes, Tim
+    
+> $toUseAgain=get-date
+
+​[10/28 8:59 AM] Howes, Tim
+    yields nothing to the pipeline
+<https://teams.microsoft.com/l/message/19:f7005fe988bb4e3d8cc29551634a88d7@thread.tacv2/1603875432324?tenantId=ca7981a2-785a-463d-b82a-3db87dfc3ce6&amp;groupId=30e1feec-9271-415b-9876-5a5429fc02d5&amp;parentMessageId=1603875432324&amp;teamName=Bromium&amp;channelName=Powershell help desk&amp;createdTime=1603875432324>
+```
+
+
+### Queues and Sets
+
+```
+[1:15 PM] Howes, Tim
+    Reminder!  Although Powershell has "as you'd expect" synactic sugar for arrays and dictionaries, you still have the colossal .net under the hood; so you can use whatever collections you like - albeit without sugar.  However, what is fun is that if you type an object strongly you can keep using that interactively.  Say you might want to use a queue :  
+​[1:15 PM] Howes, Tim
+    
+[System.Collections.Queue]$queue=@()
+
+​[1:16 PM] Howes, Tim
+    from then on any array you assign into $queue will be converted into a queue
+​[1:16 PM] Howes, Tim
+    using the squashing we learnt about recently:
+​[1:17 PM] Howes, Tim
+    
+(353)C:\dev\stage0> ($queue=dir \ -file)
+
+    Directory: C:\
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       26/03/2020     09:23            284 .gitconfig
+-a----       26/05/2020     11:13        9240136 bromium_secure_platform_x64_4_1_9_2079.xml
+-a----       21/10/2019     15:50        1159710 installAgent.log
+-a----       14/05/2019     10:28       58720256 kernel.etl
+-a----       26/05/2020     11:12          12928 msi.xsl
+-a----       06/12/2019     15:47           4361 stage0.ps1
+-a----       18/11/2019     14:33            228 _stage0.imaging
+
+​[1:17 PM] Howes, Tim
+    (yeah that's a load of crap in my root)
+​[1:17 PM] Howes, Tim
+    reminder - the "squash" meant we assigned into our variable and got output
+​[1:17 PM] Howes, Tim
+    so now we have a directory as a queue, which we can pop things off:
+​[1:17 PM] Howes, Tim
+    
+(354)C:\dev\stage0> $queue.dequeue()
+
+    Directory: C:\
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       26/03/2020     09:23            284 .gitconfig
+
+​[1:18 PM] Howes, Tim
+    
+(355)C:\dev\stage0> $queue.dequeue()
+
+    Directory: C:\
+
+Mode                LastWriteTime         Length Name
+----                -------------         ------ ----
+-a----       26/05/2020     11:13        9240136 bromium_secure_platform_x64_4_1_9_2079.xml
+
+<https://teams.microsoft.com/l/message/19:f7005fe988bb4e3d8cc29551634a88d7@thread.tacv2/1605014141150?tenantId=ca7981a2-785a-463d-b82a-3db87dfc3ce6&amp;groupId=30e1feec-9271-415b-9876-5a5429fc02d5&amp;parentMessageId=1605014141150&amp;teamName=Bromium&amp;channelName=Powershell help desk&amp;createdTime=1605014141150>
+
+[1:20 PM] Howes, Tim
+    You can do this with sets too
+​[1:21 PM] Howes, Tim
+    sets are templated, but for powershell you might as well set the template type to psobject
+​[1:21 PM] Howes, Tim
+    eg
+​[1:21 PM] Howes, Tim
+    
+[System.Collections.Generic.HashSet[psobject]]$set=@()
+
+​[1:21 PM] Howes, Tim
+    then you can interactively "diff" things quite nicely:
+​[1:21 PM] Howes, Tim
+    
+(368)C:\dev\stage0> $set=get-process | % name
+(369)C:\dev\stage0> calc
+(370)C:\dev\stage0> $set2=get-process | % name
+(371)C:\dev\stage0> $set2.exceptwith($set)
+(372)C:\dev\stage0> $set2
+Calculator
+
+<https://teams.microsoft.com/l/message/19:f7005fe988bb4e3d8cc29551634a88d7@thread.tacv2/1605014435235?tenantId=ca7981a2-785a-463d-b82a-3db87dfc3ce6&amp;groupId=30e1feec-9271-415b-9876-5a5429fc02d5&amp;parentMessageId=1605014141150&amp;teamName=Bromium&amp;channelName=Powershell help desk&amp;createdTime=1605014435235>
+
+```
