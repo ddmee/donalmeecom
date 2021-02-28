@@ -357,6 +357,8 @@ The wikipedia page on [P-Values](https://en.wikipedia.org/wiki/P-value) is prett
 
 1. What is a p value?
 
+Wiki says it best: a p-value "is the probability of obtaining test results at least as extreme as the results actually observed, under the assumption that the null hypothesis is correct"
+
 2. What is a prior?
 
 3. Provide an example of where the bear classification model might work poorly in production, due to structural or style differences in the training data.
@@ -423,7 +425,7 @@ I think Y is the dependent variable. X is the independent variable.
 
 17. What's the difference between the crop, pad, and squish resize approaches? When might you choose one over the others?
 
-
+These are all ways to manipulate an image so they are consistently sized (normalising the data?). Crop takes an image and just crops it to be a certain size. (Not sure what happens if the image is below crop size.) Pad adds stuff like a black band to fill out any missing image size. A squish transforms or shrinks the image to meet the size specified.
 
 18. What is data augmentation? Why is it needed?
 
@@ -431,11 +433,18 @@ It can make your model more robust. Data augmentation is whether you alter the d
 
 19. What is the difference between item_tfms and batch_tfms?
 
-
+These are fast-ai parameter to the learner. item_tfms = item transforms. These are transforms done on an individual item. batch_tfms = batch transforms. These transform are done on a bunch of items going into the network.
 
 20. What is a confusion matrix?
 
-A confusion matrix sets out the data that the model is predicting correctly or incorrectly.
+A confusion matrix sets out the data that the model is predicting correctly or incorrectly. It's a two-by-two matrix. Each category is on both axis. One axis is the predictions and the other axis is the correct classification. It gives a way to plot the performance of the model.
+
+| Actual | Prediction               |
+|        |  Tiger |  Bear  | Walrus |
+|Tiger   |    10  |    2   |    0   |
+|Bear    |     0  |    13  |    0   |
+|Walrus  |     1  |    0   |    7   |
+
 
 21. What does export save?
 
@@ -447,15 +456,26 @@ Interference
 
 23. What are IPython widgets?
 
+Ipython widgets are GUI elements that ipython support, that you can render inside a notebook. Jupypter started as ipython and then jupyter was spun off as a seperate project that just contain stuff for notebooks. https://en.wikipedia.org/wiki/IPython
+
 24. When might you want to use CPU for deployment? When might GPU be better?
+
+Renting CPUs is typically less expensive that GPU in today's cloud market. When the model is trained, to actually run a single inference on it, does not require lots of simultaneous calculations that GPUs are so good at. So you really don't need a GPU to gets interferences efficiently from the model. GPUs may help if your service is recieving enough requests that you can batch the inferencing up. But obviously there's some latency issues to deal with around batch timing constraints, so a user isn't waiting too long to get a response if there are not enough simultaneous requests.
 
 25. What are the downsides of deploying your app to a server, instead of to a client (or edge) device such as a phone or PC?
 
+Deploying to a server requires network connections and incurs a network latency cost. There's also more potential for denial of service issues either by malicious activity, bugs or not enough server scaling to meet demand.
+
 26. What are three examples of problems that could occur when rolling out a bear warning system in practice?
+
 
 27. What is "out-of-domain data"?
 
+That's data that you run inferences on that your model hasn't seen before. Like for example, the teddy-bear versus real bear detection, then we throw a banana at it. That's out of domain data, it's never seen it. The banana may be obviously out of domain, but there may be more subtle out-of-domain, like perhaps a teddy-bear that only has one ear, or rather than a bear, we show it a cub, or perhaps the bear is behind a bush, etc.
+
 28. What is "domain shift"?
+
+Domain shift is when the population changes. So lets say, we've trained the model on a representative and good non-bias sample of the population in year one. We then run inferences on it for three years, and everything is going well. But in the fourth year, the population begins to change - there is a domain shift - and now the model is making predictions on old data, and we'd need to retrain it.
 
 29. What are the three steps in the deployment process?
 
